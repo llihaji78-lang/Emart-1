@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>이마트 장보기 패스</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        emart: {
+                            yellow: '#FFB800',
+                            darkYellow: '#E6A300',
+                            black: '#222222',
+                            gray: '#F5F5F7',
+                            green: '#059669'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+            background-color: #f3f4f6;
+        }
+        .path-dash {
+            stroke-dasharray: 8, 4;
+            animation: dash 1.2s linear infinite;
+        }
+        @keyframes dash {
+            to {
+                stroke-dashoffset: -24;
+            }
+        }
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+        .animate-slide-up {
+            animation: slideUp 0.3s ease-out forwards;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="flex justify-center items-center min-h-screen p-0 sm:p-4 bg-slate-200">
+
+    <!-- Mobile Frame Container -->
+    <div class="w-full max-w-md bg-white min-h-screen sm:min-h-[844px] sm:max-h-[850px] sm:rounded-[36px] shadow-2xl flex flex-col overflow-hidden relative border-0 sm:border-8 border-slate-800">
+        
+        <!-- Header -->
+        <header class="bg-emart-yellow text-emart-black px-4 py-3.5 flex items-center justify-between shadow-sm z-20">
+            <div class="flex items-center space-x-2">
+                <span class="bg-emart-black text-emart-yellow text-[11px] font-black px-2 py-0.5 rounded-full uppercase tracking-tight">App</span>
+                <h1 class="font-black text-lg tracking-tight">emart <span class="font-bold text-sm text-gray-800">장보기 패스</span></h1>
+            </div>
+            <div class="text-xs font-bold bg-white/80 px-2.5 py-1 rounded-full text-gray-700">
+                금정점 지하1층
+            </div>
+        </header>
+
+        <!-- Main Screen Container -->
+        <main class="flex-1 flex flex-col relative overflow-y-auto bg-gray-50">
+
+            <!-- STEP 1: ITEM INPUT & BUDGET SCREEN -->
+            <div id="step1Screen" class="flex-1 flex flex-col p-4 space-y-4">
+                
+                <!-- Title Banner -->
+                <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+                    <span class="text-xs font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md">STEP 01</span>
+                    <h2 class="text-lg font-black text-gray-800 mt-1">구매할 상품을 입력하세요</h2>
+                    <p class="text-xs text-gray-500">지하 1층 매장 내 최적 통선 경로를 자동으로 산출합니다.</p>
+                </div>
+
+                <!-- Input Box -->
+                <div class="bg-white p-3 rounded-2xl border border-gray-200 shadow-sm flex gap-2">
+                    <input type="text" id="productInput" placeholder="상품명 입력 (예: 우유, 사과, 계란)" 
+                        class="flex-1 text-sm bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-emart-yellow"
+                        onkeypress="if(event.key==='Enter') addProductFromInput()">
+                    <button onclick="addProductFromInput()" class="bg-emart-black hover:bg-gray-800 text-white font-bold px-4 rounded-xl text-sm transition flex items-center space-x-1">
+                        <i class="fa-solid fa-plus text-xs"></i>
+                        <span>추가</span>
+                    </button>
+                </div>
+
+                <!-- Quick Selection Tags -->
+                <div>
+                    <div class="text-[11px] font-bold text-gray-400 mb-1.5 px-1">자주 찾는 추천 항목</div>
+                    <div class="flex flex-wrap gap-1.5">
+                        <button onclick="quickAdd('사과', 9900)" class="bg-white border border-gray-200 text-gray-700 text-xs px-2.5 py-1.5 rounded-lg hover:border-emart-yellow font-medium">+ 사과</button>
+                        <button onclick="quickAdd('채소', 3500)" class="bg-white border border-gray-200 text-gray-700 text-xs px-2.5 py-1.5 rounded-lg hover:border-emart-yellow font-medium">+ 채소</button>
+                        <button onclick="quickAdd('계란', 6900)" class="bg-white border border-gray-200 text-gray-700 text-xs px-2.5 py-1.5 rounded-lg hover:border-emart-yellow font-medium">+ 계란</button>
+                        <button onclick="quickAdd('수산물', 14500)" class="bg-white border border-gray-200 text-gray-700 text-xs px-2.5 py-1.5 rounded-lg hover:border-emart-yellow font-medium">+ 수산물</button>
+                        <button onclick="quickAdd('육류', 18900)" class="bg-white border border-gray-200 text-gray-700 text-xs px-2.5 py-1.5 rounded-lg hover:border-emart-yellow font-medium">+ 육류</button>
+                        <button onclick="quickAdd('우유', 2800)" class="bg-white border border-gray-200 text-gray-700 text-xs px-2.5 py-1.5 rounded-lg hover:border-emart-yellow font-medium">+ 우유</button>
+                    </div>
+                </div>
+
+                <!-- Product List Card -->
+                <div class="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm flex-1 flex flex-col min-h-[220px]">
+                    <div class="flex justify-between items-center pb-2 border-b border-gray-100">
+                        <span class="text-xs font-bold text-gray-700">담은 상품 목록</span>
+                        <span class="text-[11px] text-gray-400">지하 1층 매대 매핑 완료</span>
+                    </div>
+
+                    <div id="selectedProductsList" class="flex-1 overflow-y-auto space-y-2 py-2">
+                        <!-- Dynamic List Generated Here -->
+                    </div>
+
+                    <!-- Budget Summary -->
+                    <div class="pt-3 border-t border-gray-100">
+                        <div class="flex justify-between items-center bg-amber-50/70 p-3 rounded-xl border border-amber-200/60">
+                            <span class="text-xs font-bold text-gray-700">예상 구매 총액</span>
+                            <span id="totalBudget" class="text-base font-black text-amber-600">0 원</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button onclick="openRecommendationModal()" class="w-full bg-emart-yellow hover:bg-emart-darkYellow text-emart-black font-extrabold py-3.5 rounded-2xl shadow-md transition flex items-center justify-center space-x-2">
+                    <span>장보기 패스 시작하기</span>
+                    <i class="fa-solid fa-arrow-right text-xs"></i>
+                </button>
+            </div>
+
+            <!-- STEP 2: MAP ROUTE SCREEN -->
+            <div id="step2Screen" class="hidden flex-1 flex flex-col h-full relative">
+                
+                <!-- Target Header Bar -->
+                <div class="bg-white px-4 py-3 border-b border-gray-200 shadow-xs z-10">
+                    <div class="flex justify-between items-center mb-2">
+                        <div class="flex items-center space-x-2">
+                            <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-md">내 장보기 경로</span>
+                            <span class="text-xs font-bold text-gray-500">남은 상품: <strong id="remainingCount" class="text-emart-black">0</strong>개</span>
+                        </div>
+                        <button onclick="resetApp()" class="text-xs text-gray-400 hover:text-gray-600 flex items-center gap-1">
+                            <i class="fa-solid fa-rotate-right"></i> 다시 설정
+                        </button>
+                    </div>
+
+                    <!-- Horizontal Scrollable Top Items Bar -->
+                    <div id="topItemsBar" class="flex space-x-2 overflow-x-auto pb-1 no-scrollbar">
+                        <!-- Dynamic item buttons -->
+                    </div>
+                </div>
+
+                <!-- SVG Map View Container -->
+                <div class="flex-1 bg-amber-50/20 relative overflow-hidden flex items-center justify-center p-2">
+                    <svg id="storeMapSvg" viewBox="0 0 360 480" class="w-full h-full max-h-[460px] drop-shadow-md">
+                        <!-- Dynamic SVG Floor Plan Generated by JS -->
+                    </svg>
+
+                    <!-- Route Hint Toast -->
+                    <div id="mapHint" class="absolute bottom-3 left-4 right-4 bg-slate-900/85 text-white p-3 rounded-xl text-center backdrop-blur-xs text-xs font-medium shadow-lg">
+                        <i class="fa-solid fa-route text-emart-yellow mr-1"></i> 상단 상품을 터치하면 통로 기반 최적 동선이 안내됩니다.
+                    </div>
+                </div>
+
+                <!-- Target Navigation Control Drawer -->
+                <div id="targetControlDrawer" class="bg-white border-t border-gray-200 p-4 space-y-3 z-10 shadow-lg">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <span id="currentTargetCategory" class="text-[10px] font-bold text-gray-400 bg-gray-100 px-2 py-0.5 rounded">코너 선택</span>
+                            <h3 id="currentTargetTitle" class="text-base font-black text-gray-800">목적지 상품을 선택해주세요</h3>
+                        </div>
+                        <div id="currentTargetDistance" class="text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+                            - m
+                        </div>
+                    </div>
+
+                    <!-- Complete Target Picked Button -->
+                    <button id="completeBtn" onclick="completeCurrentProduct()" disabled class="w-full bg-gray-300 text-gray-500 font-bold py-3.5 rounded-xl transition flex items-center justify-center space-x-2 cursor-not-allowed">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <span id="completeBtnText">상품 카트 수령 후 '선택완료'</span>
+                    </button>
+                </div>
+
+                <!-- Completion Overlay -->
+                <div id="doneOverlay" class="hidden absolute inset-0 bg-white/95 backdrop-blur-md z-30 flex flex-col items-center justify-center p-6 text-center space-y-4">
+                    <div class="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-3xl shadow-lg animate-bounce">
+                        <i class="fa-solid fa-cart-flatbed-suitcases"></i>
+                    </div>
+                    <h2 class="text-2xl font-black text-gray-800">장보기 동선 완료!</h2>
+                    <p class="text-xs text-gray-500 max-w-xs">선택하신 모든 상품을 카트에 담으셨습니다.<br>계산대에서 계산 후 안전하게 이동해 주세요.</p>
+
+                    <button onclick="resetApp()" class="w-full max-w-xs bg-emart-yellow hover:bg-emart-darkYellow text-emart-black font-extrabold py-3.5 rounded-xl shadow transition">
+                        새 장보기 시작하기
+                    </button>
+                </div>
+
+            </div>
+
+            <!-- Half-Screen Horizontal Card Recommendation Modal -->
+            <div id="recommendationModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-xs z-50 flex items-end justify-center transition-all duration-300">
+                <div class="bg-gray-900 text-white w-full max-w-md rounded-t-3xl p-5 flex flex-col space-y-4 shadow-2xl animate-slide-up border-t border-gray-700">
+                    
+                    <!-- Sheet Header with Title and Close (X) Icon -->
+                    <div class="flex justify-between items-center pb-2 border-b border-gray-800">
+                        <div>
+                            <span class="text-[10px] font-bold text-amber-400 bg-amber-950/80 px-2 py-0.5 rounded-full uppercase tracking-wider">AI 연관 추천</span>
+                            <h3 class="text-base font-black text-white mt-0.5">함께 사면 좋은 연관 상품</h3>
+                        </div>
+                        <button onclick="closeRecommendationModalOnly()" class="text-gray-400 hover:text-white p-2 transition">
+                            <i class="fa-solid fa-xmark text-xl"></i>
+                        </button>
+                    </div>
+
+                    <p class="text-xs text-gray-400">담은 상품과 함께 많이 찾는 연관 추천 상품입니다. 필요한 상품을 터치해 담아보세요!</p>
+
+                    <!-- Horizontal Scrollable Cards List -->
+                    <div id="recommendationList" class="flex space-x-3 overflow-x-auto py-2 px-1 no-scrollbar min-h-[190px] items-center">
+                        <!-- Dynamic Cards Generated by JS -->
+                    </div>
+
+                    <!-- Action Button to start path page -->
+                    <div class="pt-2 border-t border-gray-800">
+                        <button onclick="startMapFromRecommendation()" class="w-full bg-emart-yellow hover:bg-emart-darkYellow text-emart-black font-extrabold py-3.5 rounded-2xl text-sm shadow-lg transition flex items-center justify-center space-x-2">
+                            <span>동선 시작하기</span>
+                            <i class="fa-solid fa-location-arrow text-xs"></i>
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+        </main>
+
+    </div>
+
+    <script>
+        // Complementary Product Recommendation Mapping Table
+        const RECOMMENDATION_MAP = {
+            '우유': [
+                { name: '빵', category: '베이커리', price: 3900 },
+                { name: '냉동만두', category: '냉동식품', price: 8900 }
+            ],
+            '사과': [
+                { name: '아몬드', category: '견과류', price: 7900 },
+                { name: '채소', category: '채소/샐러드', price: 3500 }
+            ],
+            '육류': [
+                { name: '채소', category: '채소/샐러드', price: 3500 },
+                { name: '수산물', category: '수산/초밥', price: 14500 }
+            ],
+            '계란': [
+                { name: '우유', category: '유제품', price: 2800 },
+                { name: '두부', category: '신선식품', price: 2100 }
+            ],
+            '채소': [
+                { name: '두부', category: '신선식품', price: 2100 },
+                { name: '사과', category: '과일', price: 9900 }
+            ]
+        };
+
+        // Geumjeong Store Map - Product DB
+        const PRODUCT_DATABASE = {
+            '사과': { 
+                name: '사과', category: '과일/채소 · 샐러드', price: 9900, 
+                x: 105, y: 195, waypointKey: 'CORNER_APPLE',
+                img: 'https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?auto=format&fit=crop&w=300&q=80'
+            },
+            '채소': { 
+                name: '채소', category: '과일/채소 · 샐러드', price: 3500, 
+                x: 180, y: 195, waypointKey: 'CORNER_VEG',
+                img: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=300&q=80'
+            },
+            '계란': { 
+                name: '계란', category: '신선식품', price: 6900, 
+                x: 85, y: 285, waypointKey: 'CORNER_EGG',
+                img: 'https://images.unsplash.com/photo-1516448620398-c5f44bf9f441?auto=format&fit=crop&w=300&q=80'
+            },
+            '수산물': { 
+                name: '수산물', category: '수산/초밥', price: 14500, 
+                x: 180, y: 355, waypointKey: 'CORNER_FISH',
+                img: 'https://images.unsplash.com/photo-1534483509719-3feaee7c30da?auto=format&fit=crop&w=300&q=80'
+            },
+            '육류': { 
+                name: '육류', category: '육류', price: 18900, 
+                x: 270, y: 355, waypointKey: 'CORNER_MEAT',
+                img: 'https://images.unsplash.com/photo-1603048588665-791ca8aea617?auto=format&fit=crop&w=300&q=80'
+            },
+            '우유': { 
+                name: '우유', category: '유제품', price: 2800, 
+                x: 320, y: 195, waypointKey: 'CORNER_ALMOND',
+                img: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=300&q=80'
+            },
+            '빵': { 
+                name: '빵', category: '베이커리', price: 3900, 
+                x: 250, y: 220, waypointKey: 'CORNER_NUTS',
+                img: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=300&q=80'
+            },
+            '두부': { 
+                name: '두부', category: '신선식품', price: 2100, 
+                x: 215, y: 285, waypointKey: 'CORNER_DRIED',
+                img: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=300&q=80'
+            },
+            '아몬드': { 
+                name: '아몬드', category: '견과류', price: 7900, 
+                x: 320, y: 230, waypointKey: 'CORNER_ALMOND',
+                img: 'https://images.unsplash.com/photo-1508061253366-f7da158b6d96?auto=format&fit=crop&w=300&q=80'
+            },
+            '냉동만두': { 
+                name: '냉동만두', category: '냉동식품', price: 8900, 
+                x: 290, y: 285, waypointKey: 'CORNER_FROZEN',
+                img: 'https://images.unsplash.com/photo-1496116218417-1a781b1c416c?auto=format&fit=crop&w=300&q=80'
+            }
+        };
+
+        // Strict Corridor Waypoints to prevent walking through shelves
+        const CORRIDOR_WAYPOINTS = {
+            'ENTRANCE': { x: 310, y: 55 },
+            'TOP_RIGHT_CORRIDOR': { x: 310, y: 135 },
+            'ALMOND_AISLE': { x: 310, y: 230 },
+            'MEAT_CORRIDOR_RIGHT': { x: 310, y: 315 },
+            'CHICKEN_CORNER': { x: 310, y: 390 },
+            
+            'MAIN_HORIZONTAL_TOP': { x: 230, y: 135 },
+            'MAIN_HORIZONTAL_MID': { x: 180, y: 240 },
+            'MAIN_HORIZONTAL_BOT': { x: 180, y: 315 },
+
+            'CORNER_APPLE': { x: 105, y: 240 },
+            'CORNER_VEG': { x: 180, y: 240 },
+            'CORNER_EGG': { x: 85, y: 315 },
+            'CORNER_FISH': { x: 180, y: 315 },
+            'CORNER_MEAT': { x: 270, y: 315 },
+            'CORNER_ALMOND': { x: 310, y: 230 },
+            'CORNER_NUTS': { x: 250, y: 135 },
+            'CORNER_DRIED': { x: 215, y: 315 },
+            'CORNER_FROZEN': { x: 290, y: 315 },
+
+            'EXIT_POS': { x: 105, y: 55 }
+        };
+
+        // Graph edges connecting nodes along open corridors
+        const WAYPOINT_GRAPH = {
+            'ENTRANCE': ['TOP_RIGHT_CORRIDOR'],
+            'TOP_RIGHT_CORRIDOR': ['ENTRANCE', 'MAIN_HORIZONTAL_TOP', 'ALMOND_AISLE'],
+            'MAIN_HORIZONTAL_TOP': ['TOP_RIGHT_CORRIDOR', 'CORNER_NUTS', 'EXIT_POS'],
+            'CORNER_NUTS': ['MAIN_HORIZONTAL_TOP', 'MAIN_HORIZONTAL_MID'],
+            'ALMOND_AISLE': ['TOP_RIGHT_CORRIDOR', 'MEAT_CORRIDOR_RIGHT', 'CORNER_ALMOND'],
+            'MEAT_CORRIDOR_RIGHT': ['ALMOND_AISLE', 'CHICKEN_CORNER', 'MAIN_HORIZONTAL_BOT', 'CORNER_FROZEN'],
+            'CHICKEN_CORNER': ['MEAT_CORRIDOR_RIGHT'],
+            'MAIN_HORIZONTAL_BOT': ['MEAT_CORRIDOR_RIGHT', 'CORNER_MEAT', 'CORNER_FISH', 'CORNER_DRIED', 'CORNER_EGG'],
+            'CORNER_MEAT': ['MAIN_HORIZONTAL_BOT'],
+            'CORNER_FISH': ['MAIN_HORIZONTAL_BOT', 'MAIN_HORIZONTAL_MID'],
+            'CORNER_DRIED': ['MAIN_HORIZONTAL_BOT'],
+            'CORNER_EGG': ['MAIN_HORIZONTAL_BOT', 'CORNER_APPLE'],
+            'MAIN_HORIZONTAL_MID': ['CORNER_FISH', 'CORNER_VEG', 'CORNER_NUTS', 'CORNER_APPLE'],
+            'CORNER_VEG': ['MAIN_HORIZONTAL_MID'],
+            'CORNER_APPLE': ['MAIN_HORIZONTAL_MID', 'CORNER_EGG'],
+            'EXIT_POS': ['MAIN_HORIZONTAL_TOP']
+        };
+
+        // App State
+        let selectedProducts = [
+            { ...PRODUCT_DATABASE['사과'] },
+            { ...PRODUCT_DATABASE['채소'] },
+            { ...PRODUCT_DATABASE['계란'] },
+            { ...PRODUCT_DATABASE['수산물'] },
+            { ...PRODUCT_DATABASE['육류'] }
+        ];
+
+        let currentTargetIndex = -1;
+        let recommendedItemsTemp = [];
+        let currentLocationWaypointKey = 'ENTRANCE'; // Dynamic user location
+
+        window.onload = function() {
+            renderStep1List();
+        };
+
+        function addProductFromInput() {
+            const input = document.getElementById('productInput');
+            const name = input.value.trim();
+            if(!name) return;
+
+            if(PRODUCT_DATABASE[name]) {
+                addProductToList(PRODUCT_DATABASE[name]);
+            } else {
+                addProductToList({
+                    name: name,
+                    category: '기타/생필품',
+                    price: 4500,
+                    x: 215, y: 315,
+                    waypointKey: 'CORNER_DRIED',
+                    img: 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=300&q=80'
+                });
+            }
+            input.value = '';
+        }
+
+        function quickAdd(name, price) {
+            if(PRODUCT_DATABASE[name]) {
+                addProductToList(PRODUCT_DATABASE[name]);
+            } else {
+                addProductToList({
+                    name: name, category: '신선식품', price: price,
+                    x: 180, y: 240, waypointKey: 'CORNER_VEG',
+                    img: 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=300&q=80'
+                });
+            }
+        }
+
+        function addProductToList(prod) {
+            if(!selectedProducts.some(p => p.name === prod.name)) {
+                selectedProducts.push({ ...prod });
+                renderStep1List();
+            }
+        }
+
+        function removeProduct(index) {
+            selectedProducts.splice(index, 1);
+            renderStep1List();
+        }
+
+        function renderStep1List() {
+            const container = document.getElementById('selectedProductsList');
+            const totalBudgetEl = document.getElementById('totalBudget');
+            if(!container || !totalBudgetEl) return;
+
+            container.innerHTML = '';
+            let total = 0;
+
+            if(selectedProducts.length === 0) {
+                container.innerHTML = `<div class="text-center py-8 text-gray-400 text-xs">구매할 상품을 추가해 주세요.</div>`;
+            } else {
+                selectedProducts.forEach((p, idx) => {
+                    total += p.price;
+                    container.innerHTML += `
+                        <div class="flex items-center justify-between bg-gray-50 p-2.5 rounded-xl border border-gray-100">
+                            <div class="flex items-center space-x-2.5">
+                                <img src="${p.img}" class="w-9 h-9 rounded-lg object-cover border border-gray-200" alt="${p.name}">
+                                <div>
+                                    <div class="text-xs font-bold text-gray-800">${p.name}</div>
+                                    <div class="text-[10px] text-gray-400">${p.category}</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <span class="text-xs font-bold text-gray-700">${p.price.toLocaleString()}원</span>
+                                <button onclick="removeProduct(${idx})" class="text-gray-300 hover:text-red-500 transition">
+                                    <i class="fa-solid fa-xmark text-sm"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            totalBudgetEl.innerText = `${total.toLocaleString()} 원`;
+        }
+
+        function openRecommendationModal() {
+            if(selectedProducts.length === 0) {
+                alert('최소 1개 이상의 상품을 선택해 주세요.');
+                return;
+            }
+
+            let pool = [];
+            selectedProducts.forEach(p => {
+                if(RECOMMENDATION_MAP[p.name]) {
+                    pool.push(...RECOMMENDATION_MAP[p.name]);
+                }
+            });
+
+            if(pool.length === 0) {
+                pool = [
+                    { name: '빵', category: '베이커리', price: 3900 },
+                    { name: '아몬드', category: '견과류', price: 7900 },
+                    { name: '두부', category: '신선식품', price: 2100 }
+                ];
+            }
+
+            const uniquePool = Array.from(new Map(pool.map(item => [item.name, item])).values())
+                .filter(item => !selectedProducts.some(sp => sp.name === item.name));
+
+            recommendedItemsTemp = uniquePool;
+
+            const listContainer = document.getElementById('recommendationList');
+            listContainer.innerHTML = '';
+
+            if(uniquePool.length === 0) {
+                listContainer.innerHTML = `<div class="text-xs text-gray-400 text-center w-full py-4">모든 연관 추천 상품이 이미 포함되어 있습니다.</div>`;
+            } else {
+                uniquePool.forEach(item => {
+                    const fullData = PRODUCT_DATABASE[item.name] || {
+                        ...item, x: 215, y: 315, waypointKey: 'CORNER_DRIED',
+                        img: 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=300&q=80'
+                    };
+                    listContainer.innerHTML += `
+                        <div class="min-w-[130px] max-w-[130px] bg-gray-800 rounded-2xl p-2.5 border border-gray-700 flex flex-col justify-between space-y-2 relative group">
+                            <img src="${fullData.img}" class="w-full h-20 rounded-xl object-cover" alt="${fullData.name}">
+                            <div>
+                                <span class="text-[9px] text-amber-400 font-bold bg-amber-950/80 px-1.5 py-0.5 rounded">${fullData.category}</span>
+                                <div class="text-xs font-bold text-white mt-1 truncate">${fullData.name}</div>
+                                <div class="text-[11px] font-extrabold text-amber-300 mt-0.5">${fullData.price.toLocaleString()}원</div>
+                            </div>
+                            <button onclick='toggleRecommendationAdd(this, ${JSON.stringify(fullData)})' class="w-full bg-amber-500 hover:bg-amber-400 text-gray-900 font-bold py-1.5 rounded-xl text-[11px] transition flex items-center justify-center space-x-1">
+                                <i class="fa-solid fa-plus text-[10px]"></i>
+                                <span>담기</span>
+                            </button>
+                        </div>
+                    `;
+                });
+            }
+
+            const modalEl = document.getElementById('recommendationModal');
+            if(modalEl) modalEl.classList.remove('hidden');
+        }
+
+        function toggleRecommendationAdd(btn, prodData) {
+            if(!selectedProducts.some(p => p.name === prodData.name)) {
+                selectedProducts.push(prodData);
+                btn.className = "w-full bg-emerald-600 text-white font-bold py-1.5 rounded-xl text-[11px] transition flex items-center justify-center space-x-1";
+                btn.innerHTML = `<i class="fa-solid fa-check text-[10px]"></i> <span>담김</span>`;
+            } else {
+                selectedProducts = selectedProducts.filter(p => p.name !== prodData.name);
+                btn.className = "w-full bg-amber-500 hover:bg-amber-400 text-gray-900 font-bold py-1.5 rounded-xl text-[11px] transition flex items-center justify-center space-x-1";
+                btn.innerHTML = `<i class="fa-solid fa-plus text-[10px]"></i> <span>담기</span>`;
+            }
+            renderStep1List();
+        }
+
+        function closeRecommendationModalOnly() {
+            const modalEl = document.getElementById('recommendationModal');
+            if(modalEl) modalEl.classList.add('hidden');
+        }
+
+        function startMapFromRecommendation() {
+            closeRecommendationModalOnly();
+            document.getElementById('step1Screen').classList.add('hidden');
+            document.getElementById('step2Screen').classList.remove('hidden');
+            initStep2Map();
+        }
+
+        function initStep2Map() {
+            currentTargetIndex = selectedProducts.length > 0 ? 0 : -1;
+            renderTopItemsBar();
+            renderMapSvg();
+            updateTargetDrawer();
+        }
+
+        function renderTopItemsBar() {
+            const bar = document.getElementById('topItemsBar');
+            const remainingCountEl = document.getElementById('remainingCount');
+            bar.innerHTML = '';
+            remainingCountEl.innerText = selectedProducts.length;
+
+            selectedProducts.forEach((p, idx) => {
+                const isSelected = idx === currentTargetIndex;
+                bar.innerHTML += `
+                    <button onclick="selectTargetProduct(${idx})" 
+                        class="flex-shrink-0 flex items-center space-x-1.5 px-3 py-1.5 rounded-full border text-xs font-bold transition ${
+                            isSelected 
+                            ? 'bg-emart-yellow border-amber-500 text-emart-black shadow-sm' 
+                            : 'bg-gray-100 border-gray-200 text-gray-600 hover:bg-gray-200'
+                        }">
+                        <span class="w-4 h-4 rounded-full ${isSelected ? 'bg-emart-black text-emart-yellow' : 'bg-gray-300 text-gray-700'} text-[9px] flex items-center justify-center">${idx + 1}</span>
+                        <span>${p.name}</span>
+                    </button>
+                `;
+            });
+        }
+
+        function selectTargetProduct(idx) {
+            currentTargetIndex = idx;
+            renderTopItemsBar();
+            renderMapSvg();
+            updateTargetDrawer();
+        }
+
+        function findShortestCorridorPath(startKey, targetKey) {
+            if(startKey === targetKey) return [CORRIDOR_WAYPOINTS[startKey]];
+
+            let queue = [[startKey]];
+            let visited = new Set([startKey]);
+
+            while(queue.length > 0) {
+                let path = queue.shift();
+                let node = path[path.length - 1];
+
+                if(node === targetKey) {
+                    return path.map(k => CORRIDOR_WAYPOINTS[k]);
+                }
+
+                let neighbors = WAYPOINT_GRAPH[node] || [];
+                for(let neighbor of neighbors) {
+                    if(!visited.has(neighbor)) {
+                        visited.add(neighbor);
+                        queue.push([...path, neighbor]);
+                    }
+                }
+            }
+            return [CORRIDOR_WAYPOINTS[startKey], CORRIDOR_WAYPOINTS[targetKey]];
+        }
+
+        function renderMapSvg() {
+            const svg = document.getElementById('storeMapSvg');
+            let currentTarget = selectedProducts[currentTargetIndex];
+
+            let pathD = '';
+            if(currentTarget) {
+                const pathWaypoints = findShortestCorridorPath(currentLocationWaypointKey, currentTarget.waypointKey);
+                
+                pathWaypoints.push({ x: currentTarget.x, y: currentTarget.y });
+
+                pathD = `M ${pathWaypoints[0].x} ${pathWaypoints[0].y}`;
+                for(let i = 1; i < pathWaypoints.length; i++) {
+                    pathD += ` L ${pathWaypoints[i].x} ${pathWaypoints[i].y}`;
+                }
+            }
+
+            const currentPos = CORRIDOR_WAYPOINTS[currentLocationWaypointKey] || { x: 310, y: 55 };
+
+            svg.innerHTML = `
+                <!-- Background Floor Base -->
+                <rect x="10" y="10" width="340" height="460" rx="16" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="2"/>
+
+                <!-- Top Entrance & Exit -->
+                <rect x="270" y="25" width="70" height="30" rx="6" fill="#E0F2FE" stroke="#0284C7" stroke-width="1.5"/>
+                <text x="305" y="44" font-size="10" font-weight="bold" fill="#0369A1" text-anchor="middle">입구</text>
+
+                <rect x="70" y="25" width="70" height="30" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
+                <text x="105" y="44" font-size="10" font-weight="bold" fill="#B45309" text-anchor="middle">계산대</text>
+
+                <rect x="150" y="25" width="110" height="30" rx="6" fill="#F3F4F6" stroke="#D1D5DB" stroke-width="1"/>
+                <text x="205" y="44" font-size="9" font-weight="bold" fill="#6B7280" text-anchor="middle">고객만족센터</text>
+
+                <!-- Corridor Grid Labels -->
+                <!-- Top Aisle Fruits & Veggies -->
+                <rect x="70" y="150" width="160" height="70" rx="8" fill="#DCFCE7" stroke="#16A34A" stroke-width="1.5"/>
+                <text x="150" y="175" font-size="11" font-weight="extrabold" fill="#15803D" text-anchor="middle">과일/채소 · 샐러드</text>
+                <text x="105" y="210" font-size="9" font-weight="bold" fill="#166534" text-anchor="middle">① 사과</text>
+                <text x="180" y="210" font-size="9" font-weight="bold" fill="#166534" text-anchor="middle">② 채소</text>
+
+                <!-- Almond & Nuts right section -->
+                <rect x="240" y="150" width="100" height="120" rx="8" fill="#FEF3C7" stroke="#F59E0B" stroke-width="1.5"/>
+                <text x="290" y="185" font-size="10" font-weight="bold" fill="#B45309" text-anchor="middle">쌀 / 견과류</text>
+                <text x="290" y="240" font-size="11" font-weight="extrabold" fill="#92400E" text-anchor="middle">아몬드 / 우유</text>
+
+                <!-- Bottom Fresh Food Row -->
+                <rect x="70" y="250" width="60" height="60" rx="8" fill="#FEE2E2" stroke="#EF4444" stroke-width="1.5"/>
+                <text x="100" y="285" font-size="10" font-weight="bold" fill="#B91C1C" text-anchor="middle">③ 계란</text>
+
+                <rect x="140" y="250" width="80" height="60" rx="8" fill="#E0F2FE" stroke="#0284C7" stroke-width="1.5"/>
+                <text x="180" y="285" font-size="10" font-weight="bold" fill="#0369A1" text-anchor="middle">두부 / 건식품</text>
+
+                <rect x="230" y="280" width="110" height="30" rx="8" fill="#E0E7FF" stroke="#6366F1" stroke-width="1.5"/>
+                <text x="285" y="299" font-size="10" font-weight="bold" fill="#4338CA" text-anchor="middle">냉동 수산 · 육류</text>
+
+                <!-- Bottom Seafood & Meat -->
+                <rect x="140" y="325" width="80" height="60" rx="8" fill="#E0F2FE" stroke="#0369A1" stroke-width="1.5"/>
+                <text x="180" y="360" font-size="10" font-weight="extrabold" fill="#075985" text-anchor="middle">④ 수산물</text>
+
+                <rect x="230" y="325" width="80" height="60" rx="8" fill="#FFE4E6" stroke="#E11D48" stroke-width="1.5"/>
+                <text x="270" y="360" font-size="10" font-weight="extrabold" fill="#9F1239" text-anchor="middle">⑤ 육류</text>
+
+                <!-- Route Path Guidance Line -->
+                ${pathD ? `
+                    <path d="${pathD}" fill="none" stroke="#059669" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="${pathD}" fill="none" stroke="#34D399" stroke-width="2.5" class="path-dash" stroke-linecap="round" stroke-linejoin="round"/>
+                ` : ''}
+
+                <!-- Dynamic User Location Marker -->
+                <g transform="translate(${currentPos.x}, ${currentPos.y})">
+                    <circle r="12" fill="#EF4444" fill-opacity="0.2" class="animate-ping"/>
+                    <circle r="8" fill="#EF4444" stroke="#FFFFFF" stroke-width="2"/>
+                    <text y="18" font-size="8" font-weight="black" fill="#EF4444" text-anchor="middle">내 위치</text>
+                </g>
+
+                <!-- Destination Target Marker with Gorae-it Character -->
+                ${currentTarget ? `
+                    <g transform="translate(${currentTarget.x}, ${currentTarget.y})">
+                        <circle r="16" fill="#FFB800" fill-opacity="0.3" class="animate-pulse"/>
+                        <!-- Gorae-it Character Representation -->
+                        <circle r="11" fill="#FFB800" stroke="#FFFFFF" stroke-width="2"/>
+                        <path d="M -4 -2 Q 0 -6 4 -2" fill="none" stroke="#222" stroke-width="1.5" stroke-linecap="round"/>
+                        <circle cx="-3" cy="-1" r="1" fill="#222"/>
+                        <circle cx="3" cy="-1" r="1" fill="#222"/>
+                        <path d="M -2 2 Q 0 4 2 2" fill="none" stroke="#222" stroke-width="1"/>
+                        <text y="-16" font-size="9" font-weight="black" fill="#111827" text-anchor="middle" class="drop-shadow-xs">${currentTarget.name}</text>
+                    </g>
+                ` : ''}
+            `;
+        }
+
+        function updateTargetDrawer() {
+            const currentTarget = selectedProducts[currentTargetIndex];
+            const titleEl = document.getElementById('currentTargetTitle');
+            const categoryEl = document.getElementById('currentTargetCategory');
+            const distanceEl = document.getElementById('currentTargetDistance');
+            const completeBtn = document.getElementById('completeBtn');
+            const completeBtnText = document.getElementById('completeBtnText');
+
+            if(!currentTarget) {
+                titleEl.innerText = "모든 상품 수령 완료";
+                categoryEl.innerText = "완료";
+                distanceEl.innerText = "0 m";
+                completeBtn.disabled = true;
+                completeBtn.className = "w-full bg-gray-300 text-gray-500 font-bold py-3.5 rounded-xl cursor-not-allowed flex items-center justify-center space-x-2";
+                
+                document.getElementById('doneOverlay').classList.remove('hidden');
+                return;
+            }
+
+            titleEl.innerText = `${currentTargetIndex + 1}. ${currentTarget.name} 코너 이동 중`;
+            categoryEl.innerText = currentTarget.category;
+            distanceEl.innerText = `약 ${(12 + currentTargetIndex * 7)} m`;
+
+            completeBtn.disabled = false;
+            completeBtn.className = "w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold py-3.5 rounded-xl shadow-md transition flex items-center justify-center space-x-2";
+            completeBtnText.innerText = `'${currentTarget.name}' 수령 후 선택완료`;
+        }
+
+        function completeCurrentProduct() {
+            if(currentTargetIndex < 0 || currentTargetIndex >= selectedProducts.length) return;
+
+            const pickedProduct = selectedProducts[currentTargetIndex];
+            if(pickedProduct && pickedProduct.waypointKey) {
+                currentLocationWaypointKey = pickedProduct.waypointKey;
+            }
+
+            selectedProducts.splice(currentTargetIndex, 1);
+
+            if(selectedProducts.length === 0) {
+                currentTargetIndex = -1;
+                renderTopItemsBar();
+                renderMapSvg();
+                updateTargetDrawer();
+            } else {
+                if(currentTargetIndex >= selectedProducts.length) {
+                    currentTargetIndex = 0;
+                }
+                renderTopItemsBar();
+                renderMapSvg();
+                updateTargetDrawer();
+            }
+        }
+
+        function resetApp() {
+            document.getElementById('doneOverlay').classList.add('hidden');
+            document.getElementById('step2Screen').classList.add('hidden');
+            document.getElementById('step1Screen').classList.remove('hidden');
+
+            currentLocationWaypointKey = 'ENTRANCE';
+            selectedProducts = [
+                { ...PRODUCT_DATABASE['사과'] },
+                { ...PRODUCT_DATABASE['채소'] },
+                { ...PRODUCT_DATABASE['계란'] },
+                { ...PRODUCT_DATABASE['수산물'] },
+                { ...PRODUCT_DATABASE['육류'] }
+            ];
+            renderStep1List();
+        }
+    </script>
+</body>
+</html>
